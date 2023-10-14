@@ -7,25 +7,36 @@ class Client
 {
 	static boolean keep_listening = true;
 	static int listen_port = 6969;
-	// static int send_port = 6968;
+	static int send_port = 6968;
 
-	static InetAddress server_address;
+	public static InetAddress server_address;
 
 	public static void main(String[] args) throws IOException {
-		try(DatagramSocket socket = new DatagramSocket(listen_port))
-		{
+		try (DatagramSocket socket = new DatagramSocket(listen_port)) {
 			byte[] data_buffer = new byte[1024];
 
-			while(keep_listening)
-			{
+			while (keep_listening) {
 				DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
 				socket.receive(received_packet);
 
-				String message = new String(received_packet.getData(), 0, received_packet.getLength());
-				Client.server_address = received_packet.getAddress();
+				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
+				server_address = received_packet.getAddress();
 
-				System.out.println("Received message from server: " + message);
+				pingServer();
 			}
 		}
+	}
+
+	static void pingServer() throws IOException
+	{
+		if(server_address == null) return;
+		System.out.println(server_address);
+
+		DatagramSocket socket = new DatagramSocket();
+		String message = "Sou lindo 2";
+
+		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), server_address, send_port);
+		socket.send(packet);
+		socket.close();
 	}
 }
