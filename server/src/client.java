@@ -15,12 +15,15 @@ class Client
 		try (DatagramSocket socket = new DatagramSocket(listen_port)) {
 			byte[] data_buffer = new byte[1024];
 
-			while (keep_listening) {
+			while (keep_listening)
+			{
 				DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
 				socket.receive(received_packet);
 
 				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
 				server_address = received_packet.getAddress();
+
+				if(!message.equals("ATTENDANCE_COUNT") || server_address == null) continue;
 
 				pingServer();
 			}
@@ -30,10 +33,9 @@ class Client
 	static void pingServer() throws IOException
 	{
 		if(server_address == null) return;
-		System.out.println(server_address);
 
 		DatagramSocket socket = new DatagramSocket();
-		String message = "Sou lindo 2";
+		String message = "aodkgir2nt94";
 
 		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), server_address, send_port);
 		socket.send(packet);

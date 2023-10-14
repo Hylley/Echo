@@ -11,7 +11,7 @@ import java.io.IOException;
 
 class Server
 {
-	private static final int PING_PERIOD_IN_SECONDS = 3;
+	private static final int PING_PERIOD_IN_SECONDS = 5;
 
 	public static int send_port = 6969;
 	public static int listen_port = 6968;
@@ -34,8 +34,9 @@ class PingNetwork implements Runnable
 
 	public void pingNetwork() throws IOException
 	{
+		System.out.println("Ping nodes: ");
 		DatagramSocket socket = new DatagramSocket();
-		String message = "Sou lindo 1";
+		String message = "ATTENDANCE_COUNT";
 		InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP.
 
 		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.send_port);
@@ -65,6 +66,7 @@ class ListenNetwork extends Thread
 				server_socket.receive(received_packet);
 
 				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
+				System.out.println(message);
 
 				// Do something with the data message
 			}
