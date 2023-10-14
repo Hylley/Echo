@@ -12,7 +12,8 @@ class Client
 	public static InetAddress server_address;
 
 	public static void main(String[] args) throws IOException {
-		try (DatagramSocket socket = new DatagramSocket(listen_port)) {
+		try (DatagramSocket socket = new DatagramSocket(listen_port))
+		{
 			byte[] data_buffer = new byte[1024];
 
 			while (keep_listening)
@@ -23,9 +24,11 @@ class Client
 				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
 				server_address = received_packet.getAddress();
 
+				System.out.println(server_address.getHostAddress());
+
 				if(!message.equals("ATTENDANCE_COUNT") || server_address == null) continue;
 
-				pingServer();
+				pingServer(); 
 			}
 		}
 	}

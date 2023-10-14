@@ -1,12 +1,8 @@
+import java.net.*;
+import java.util.Enumeration;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
-import java.net.ServerSocket;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 class Server
@@ -16,10 +12,11 @@ class Server
 	public static int send_port = 6969;
 	public static int listen_port = 6968;
 
-	public static void main(String[] args)
-	{
-		PingNetwork ping_network = new PingNetwork();
+	public static void main(String[] args) throws UnknownHostException, SocketException {
 
+		System.out.println("Server on: " + InetAddress.getLocalHost().getHostAddress());
+
+		PingNetwork ping_network = new PingNetwork();
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 		executor.scheduleAtFixedRate(ping_network, 0, PING_PERIOD_IN_SECONDS, TimeUnit.SECONDS);
 
@@ -49,6 +46,7 @@ class PingNetwork implements Runnable
 // rede funciona num loop infinito, enquanto o método para pingar os nós da rede é executada periodicamente. Fazer tudo
 // na mesma thread de execução bagunçaria a ordem das coisas e faria com que uma delas nem sequer fosse executada em
 // primeiro lugar. A arquitetura do projeto (pelo menos a do servidor) me obriga a usar mais de um fluxo de instruções.
+// Mas não nego que gostei disso.
 class ListenNetwork extends Thread
 {
 	public static boolean keep_listening = true;
@@ -59,6 +57,7 @@ class ListenNetwork extends Thread
 	{
 		try(DatagramSocket server_socket = new DatagramSocket(Server.listen_port))
 		{
+			server_socket.setBroadcast(true);
 			byte[] data_buffer = new byte[1024];
 
 			while (keep_listening) {
@@ -66,9 +65,9 @@ class ListenNetwork extends Thread
 				server_socket.receive(received_packet);
 
 				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
-				System.out.println(message);
 
 				// Do something with the data message
+				System.out.println(message);
 			}
 		}
 	}
