@@ -35,7 +35,7 @@ class Client
 		if(server_address == null) return;
 
 		DatagramSocket socket = new DatagramSocket();
-		String message = "aodkgir2nt94";
+		String message = "girlhood2nt94";
 
 		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), server_address, send_port);
 		socket.send(packet);
