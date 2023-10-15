@@ -1,5 +1,4 @@
 import java.net.*;
-import java.util.Enumeration;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -8,11 +7,11 @@ import java.io.IOException;
 class Server
 {
 	private static final int PING_PERIOD_IN_SECONDS = 5;
+	public static final int SEND_PORT = 6969;
+	public static final int LISTEN_PORT = 6968;
 
-	public static int send_port = 6969;
-	public static int listen_port = 6968;
-
-	public static void main(String[] args) throws UnknownHostException, SocketException {
+	public static void main(String[] args) throws UnknownHostException
+	{
 
 		System.out.println("Server on: " + InetAddress.getLocalHost().getHostAddress());
 
@@ -33,10 +32,11 @@ class PingNetwork implements Runnable
 	{
 		System.out.println("Ping nodes: ");
 		DatagramSocket socket = new DatagramSocket();
+		socket.setBroadcast(true);
 		String message = "ATTENDANCE_COUNT";
 		InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP.
 
-		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.send_port);
+		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.SEND_PORT);
 		socket.send(packet);
 		socket.close();
 	}
@@ -55,12 +55,12 @@ class ListenNetwork extends Thread
 
 	void listenNetwork() throws Exception
 	{
-		try(DatagramSocket server_socket = new DatagramSocket(Server.listen_port))
+		try(DatagramSocket server_socket = new DatagramSocket(Server.LISTEN_PORT))
 		{
-			server_socket.setBroadcast(true);
 			byte[] data_buffer = new byte[1024];
 
-			while (keep_listening) {
+			while (keep_listening)
+			{
 				DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
 				server_socket.receive(received_packet);
 
