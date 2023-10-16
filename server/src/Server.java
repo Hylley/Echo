@@ -1,14 +1,23 @@
-import java.net.*;
+import java.net.UnknownHostException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.ServerSocket;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.io.ObjectInputStream;
 import java.io.IOException;
+
 
 class Server
 {
-	private static final int PING_PERIOD_IN_SECONDS = 10;
+	private static final int PING_PERIOD_IN_SECONDS = 1; // Quanto menor o valor, mais processamento é requerido e mais confiável o resultado.
 	public static final int SEND_PORT = 6969;
 	public static final int LISTEN_PORT = 6968;
+
+	public static boolean keep_listening = true;
 
 	public static void main(String[] args) throws UnknownHostException
 	{
@@ -27,19 +36,20 @@ class Server
 class PingNetwork implements Runnable
 {
 	@Override
-	public void run() { try { pingNetwork(); } catch (IOException e) { throw new RuntimeException(e); } }
-
-	public void pingNetwork() throws IOException
+	public void run()
 	{
-		System.out.println("Ping nodes: ");
-		DatagramSocket socket = new DatagramSocket();
-		socket.setBroadcast(true);
-		String message = "ATTENDANCE_COUNT";
-		InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP.
+		try (DatagramSocket socket = new DatagramSocket())
+		{
+			socket.setBroadcast(true);
+			String message = "ATTENDANCE_COUNT";
+			InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP.
 
-		DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.SEND_PORT);
-		socket.send(packet);
-		socket.close();
+			DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.SEND_PORT);
+			socket.send(packet);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
 
@@ -48,29 +58,25 @@ class PingNetwork implements Runnable
 // na mesma thread de execução bagunçaria a ordem das coisas e faria com que uma delas nem sequer fosse executada em
 // primeiro lugar. A arquitetura do projeto (pelo menos a do servidor) me obriga a usar mais de um fluxo de instruções.
 // Mas não nego que gostei disso.
-class ListenNetwork extends Thread
+class ListenNetwork extends Thread implements Runnable
 {
-	public static boolean keep_listening = true;
-
 	@Override
-	public void run() { try  { listenNetwork(); }  catch (Exception e)  { throw new RuntimeException(e); } }
-
-	void listenNetwork() throws Exception
+	public void run()
 	{
-		try(DatagramSocket server_socket = new DatagramSocket(Server.LISTEN_PORT))
+		try(ServerSocket server_socket = new ServerSocket(Server.LISTEN_PORT))
 		{
-			byte[] data_buffer = new byte[1024];
-
-			while (keep_listening)
+			while(Server.keep_listening)
 			{
-				DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
-				server_socket.receive(received_packet);
-
-				String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
+				Socket client_socket = server_socket.accept();
+				ObjectInputStream input = new ObjectInputStream(client_socket.getInputStream());
+				String message = (String)input.readObject();
 
 				// Do something with the data message
 				System.out.println(message);
 			}
+		}
+		catch (IOException | ClassNotFoundException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
