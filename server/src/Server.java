@@ -29,8 +29,8 @@ class Server
 	{
 		System.out.println("Server hosted at: " + InetAddress.getLocalHost().getHostAddress());
 
-		PingNetwork   pingNetwork   = new PingNetwork(); // Envia pacotes para toda a rede (UDP);
-		ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP).
+		PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
+		ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
 
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 		executor.scheduleAtFixedRate(pingNetwork, 0, BROADCAST_PERIOD_IN_SECONDS, TimeUnit.SECONDS);
@@ -43,7 +43,7 @@ class PingNetwork implements Runnable
 	@Override
 	public void run()
 	{
-		try (DatagramSocket socket = new DatagramSocket())
+		try( DatagramSocket socket = new DatagramSocket() )
 		{
 			socket.setBroadcast(true);
 			String message = "ATTENDANCE_COUNT";
@@ -52,9 +52,7 @@ class PingNetwork implements Runnable
 			DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.SEND_PORT);
 			socket.send(packet);
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		catch (IOException e) { throw new RuntimeException(e); }
 	}
 }
 
@@ -71,7 +69,7 @@ class ListenNetwork extends Thread implements Runnable /*
 	@Override
 	public void run()
 	{
-		try(ServerSocket server_socket = new ServerSocket(Server.LISTEN_PORT))
+		try( ServerSocket server_socket = new ServerSocket(Server.LISTEN_PORT) )
 		{
 			while(Server.keep_listening)
 			{
@@ -83,8 +81,6 @@ class ListenNetwork extends Thread implements Runnable /*
 				System.out.println(message);
 			}
 		}
-		catch (IOException | ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}
 }

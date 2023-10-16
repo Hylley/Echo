@@ -10,20 +10,20 @@ import java.net.Socket;
 
 class Client extends Thread implements Runnable
 {
-    static final int LISTEN_PORT = 6969;
-    static final int SEND_PORT = 6968;
+    private static final int LISTEN_PORT = 6969;
+    private static final int SEND_PORT = 6968;
 
-    static boolean keep_listening = true;
-    public static InetAddress server_address;
+    private InetAddress server_address;
+    private boolean keep_listening = true;
 
     @Override
     public void run()
     {
-        try (DatagramSocket socket = new DatagramSocket(LISTEN_PORT))
+        try( DatagramSocket socket = new DatagramSocket(LISTEN_PORT) )
         {
             byte[] data_buffer = new byte[1024];
 
-            while (keep_listening)
+            do
             {
                 DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
                 socket.receive(received_packet);
@@ -35,12 +35,13 @@ class Client extends Thread implements Runnable
 
                 ping_server();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            while (keep_listening);
+
         }
+        catch (IOException e) { throw new RuntimeException(e); }
     }
 
-    static void ping_server() throws IOException
+    private void ping_server() throws IOException
     {
         if(server_address == null) return;
 
@@ -48,5 +49,10 @@ class Client extends Thread implements Runnable
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()); output.flush();
         output.writeObject("girlhood2nt93");
         output.close(); socket.close();
+    }
+
+    public void end_process()
+    {
+        keep_listening = false;
     }
 }
