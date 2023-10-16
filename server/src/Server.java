@@ -6,7 +6,7 @@ import java.io.IOException;
 
 class Server
 {
-	private static final int PING_PERIOD_IN_SECONDS = 5;
+	private static final int PING_PERIOD_IN_SECONDS = 10;
 	public static final int SEND_PORT = 6969;
 	public static final int LISTEN_PORT = 6968;
 
@@ -26,6 +26,7 @@ class Server
 
 class PingNetwork implements Runnable
 {
+	@Override
 	public void run() { try { pingNetwork(); } catch (IOException e) { throw new RuntimeException(e); } }
 
 	public void pingNetwork() throws IOException
@@ -51,6 +52,7 @@ class ListenNetwork extends Thread
 {
 	public static boolean keep_listening = true;
 
+	@Override
 	public void run() { try  { listenNetwork(); }  catch (Exception e)  { throw new RuntimeException(e); } }
 
 	void listenNetwork() throws Exception
