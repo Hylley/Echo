@@ -1,11 +1,12 @@
 package com.hylley.echo;
-
+//region Imports
 import java.io.ObjectOutputStream;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
 import java.net.Socket;
+//endregion
 
 class Client extends Thread implements Runnable
 {
@@ -32,14 +33,14 @@ class Client extends Thread implements Runnable
 
                 if(!message.equals("ATTENDANCE_COUNT") || server_address == null) continue;
 
-                pingServer();
+                ping_server();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    static void pingServer() throws IOException
+    static void ping_server() throws IOException
     {
         if(server_address == null) return;
 
