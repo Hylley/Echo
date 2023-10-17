@@ -1,4 +1,3 @@
-//region Imports
 import java.net.UnknownHostException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -8,13 +7,15 @@ import java.net.Socket;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.ObjectInputStream;
 import java.io.IOException;
-//endregion
+
 
 class Server
 {
-	private static final int BROADCAST_PERIOD_IN_SECONDS = 1; /*
+	private static final int BROADCAST_PERIOD_IN_SECONDS = 3; /*
 		Transmissões frequentes e desnecessárias podem causar congestão na rede, reduzindo a eficiência geral dela e
 		potencialmente causando atrasos na entrega de mensagens e pacotes de internet. No entanto, quanto mais
 		transmissões, maiores as chances dos pacotes do servidor alcançarem todos os nós da rede, o que significa
@@ -27,7 +28,8 @@ class Server
 
 	public static void main(String[] args) throws UnknownHostException
 	{
-		System.out.println("Server hosted at: " + InetAddress.getLocalHost().getHostAddress());
+		System.out.println("Serving at:   " + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
+		System.out.println("Listening at: " + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
 
 		PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
 		ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
@@ -71,15 +73,27 @@ class ListenNetwork extends Thread implements Runnable /*
 	{
 		try( ServerSocket server_socket = new ServerSocket(Server.LISTEN_PORT) )
 		{
-			while(Server.keep_listening)
+			do
 			{
 				Socket client_socket = server_socket.accept();
 				ObjectInputStream input = new ObjectInputStream(client_socket.getInputStream());
-				String message = (String)input.readObject();
+				@SuppressWarnings("unchecked") Map<String, String> body = (HashMap<String, String>) input.readObject();
 
-				// Do something with the data message
-				System.out.println(message);
+				switch (body.get("request_type"))
+				{
+					case "ATTENDANCE_COUNT":
+						String user_id = body.get("user_id");
+						String user_name = body.get("user_name");
+
+						System.out.println(user_id + " " + user_name);
+						break;
+					case "REGISTER_NEW_USER_I":
+					case "GLOBAL_TEXT_MESSAGE":
+					case "GLOBAL_FILE_MESSAGE":
+					default: System.out.println("Err: Invalid request type;"); break;
+				}
 			}
+			while (Server.keep_listening);
 		}
 		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}
