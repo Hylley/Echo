@@ -4,16 +4,16 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.ObjectInputStream;
-import java.io.IOException;
 
 
-class Server
+final class Server
 {
 	private static final int BROADCAST_PERIOD_IN_SECONDS = 3; /*
 		Transmissões frequentes e desnecessárias podem causar congestão na rede, reduzindo a eficiência geral dela e
@@ -24,19 +24,23 @@ class Server
 	public static final int SEND_PORT = 6969;
 	public static final int LISTEN_PORT = 6968;
 
-	public static boolean keep_listening = true; // Que tipo de linguagem usa "boolean" em vez de "bool" vsffff
+	PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
+	ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
+	ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
-	public static void main(String[] args) throws UnknownHostException
+	public Server() throws UnknownHostException
 	{
-		System.out.println("Serving at:   " + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
-		System.out.println("Listening at: " + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
+		System.out.println("Serving at   " + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
+		System.out.println("Listening at " + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
 
-		PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
-		ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
-
-		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 		executor.scheduleAtFixedRate(pingNetwork, 0, BROADCAST_PERIOD_IN_SECONDS, TimeUnit.SECONDS);
 		listenNetwork.start();
+	}
+
+	public void end_process()
+	{
+		listenNetwork.keep_listening = false;
+		executor.shutdown();
 	}
 }
 
@@ -68,6 +72,8 @@ class ListenNetwork extends Thread implements Runnable /*
 	Mas não nego que gostei...
 */
 {
+	public boolean keep_listening = true; // Que tipo de linguagem usa "boolean" em vez de "bool" vsffff
+
 	@Override
 	public void run()
 	{
@@ -93,7 +99,7 @@ class ListenNetwork extends Thread implements Runnable /*
 					default: System.out.println("Err: Invalid request type;"); break;
 				}
 			}
-			while (Server.keep_listening);
+			while (keep_listening);
 		}
 		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}
