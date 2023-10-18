@@ -1,6 +1,9 @@
+import java.util.HashMap;
+
 public class Eco
 {
-	private String id;
+	private final String id;
+	private final HashMap<String, String> data = new HashMap<>();
 
 	public Eco(String id) { this.id = id; }
 

@@ -12,7 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
-import java.util.Map;
 
 
 public final class Server
@@ -27,7 +26,7 @@ public final class Server
 	public static final int LISTEN_PORT = 6968;
 
 	PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
-	ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
+	ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread paralela.
 	ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
 	public Server()
@@ -43,24 +42,41 @@ public final class Server
 		listenNetwork.start();
 	}
 
-	public static byte[] get_data_register_format()
+	public static byte[] get_data_register_binaries() /*
+		Esse método geralmente só é utilizado pela classe Main, que transforma os bytes em um código QR e exibe numa
+		janela nova. O cliente, por sua vez, escaneia o código através do aplicativo e obtém todos os dados necessários
+		para identificar o servidor na rede e determinar o conteúdo de corpo necessário para enviar um pacote de
+		registro. O usuário insere os dados, o pacote é enviado e, se aceito, passa a constar no painel de presença.
+	*/
 	{
 		try
 		{
-			Map<String, String> config = new HashMap<>();
-			config.put("host_address", InetAddress.getLocalHost().getHostAddress());
-			config.put("listen_port", String.valueOf(LISTEN_PORT));
-			config.put("form_data", "[nome, matrícula, idade]");
+			HashMap<String, String> config = new HashMap<>(); /*
+				Não precisa me julgar. Eu já faço isso por conta própria.
 
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(config); oos.flush();
+				Serialização pode ser feita com literalmente qualquer objeto. Escolhi HashMaps por ser o mais próximo de
+				um JSON comum, portanto, é mais legível e padronizado com a web, embora ambos sejam métodos ineficientes
+				de armazenamento e manipulação de dados. Isso torna o QR code desnecessariamente grande no longo prazo.
 
-			return bos.toByteArray();
+				Alternativas mais viáveis para produção seriam (1) uma classe contêiner especialmente feita para segurar
+				esses dados ou (2) um vetor simples com os itens cuidadosamente posicionados. Um problema com a primeira
+				é ter de sincronizar as definições das classes em ambos os programas (além de desistir de
+				retrocompatibilidade com qualquer mínima alteração); e a segunda só falta legibilidade mesmo.
+			*/
+			config.put("host", InetAddress.getLocalHost().getHostAddress());
+			config.put("port", String.valueOf(LISTEN_PORT));
+			config.put("form", String.join(",", Main.form_data));
+
+			ByteArrayOutputStream byte_stream = new ByteArrayOutputStream();
+			ObjectOutputStream output_stream = new ObjectOutputStream(byte_stream);
+			output_stream.writeObject(config); output_stream.flush();
+
+			return byte_stream.toByteArray();
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
 	}
 
+	@SuppressWarnings("unused")
 	public void end_process()
 	{
 		listenNetwork.keep_listening = false;
@@ -107,12 +123,12 @@ class ListenNetwork extends Thread implements Runnable /*
 			{
 				Socket client_socket = server_socket.accept();
 				ObjectInputStream input = new ObjectInputStream(client_socket.getInputStream());
-				@SuppressWarnings("unchecked") Map<String, String> body = (HashMap<String, String>) input.readObject();
+				@SuppressWarnings("unchecked") HashMap<String, String> body = (HashMap<String, String>) input.readObject();
 
 				switch (body.get("request_type"))
 				{
 					case "ATTENDANCE_COUNT":
-						Main.set_attendance(body.get("user_id"), true);
+						Main.set_attendance(body.get("echo_id"));
 						break;
 					case "REGISTER_NEW_USER_I":
 					case "GLOBAL_TEXT_MESSAGE":
