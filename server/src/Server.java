@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,9 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-final class Server
+public final class Server
 {
-	private static final int BROADCAST_PERIOD_IN_SECONDS = 3; /*
+	private static final int BROADCAST_PERIOD_IN_SECONDS = 1; /*
 		Transmissões frequentes e desnecessárias podem causar congestão na rede, reduzindo a eficiência geral dela e
 		potencialmente causando atrasos na entrega de mensagens e pacotes de internet. No entanto, quanto mais
 		transmissões, maiores as chances dos pacotes do servidor alcançarem todos os nós da rede, o que significa
@@ -28,13 +30,35 @@ final class Server
 	ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread alternativa.
 	ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
-	public Server() throws UnknownHostException
+	public Server()
 	{
-		System.out.println("Serving at   " + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
-		System.out.println("Listening at " + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
+		try
+		{
+			System.out.println("Hosting at:  	" + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
+			System.out.println("Listening at:	" + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
+		}
+		catch (UnknownHostException e) { throw new RuntimeException(e); }
 
 		executor.scheduleAtFixedRate(pingNetwork, 0, BROADCAST_PERIOD_IN_SECONDS, TimeUnit.SECONDS);
 		listenNetwork.start();
+	}
+
+	public static byte[] get_data_register_format()
+	{
+		try
+		{
+			Map<String, String> config = new HashMap<>();
+			config.put("host_address", InetAddress.getLocalHost().getHostAddress());
+			config.put("listen_port", String.valueOf(LISTEN_PORT));
+			config.put("form_data", "[nome, matrícula, idade]");
+
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(config); oos.flush();
+
+			return bos.toByteArray();
+		}
+		catch (IOException e) { throw new RuntimeException(e); }
 	}
 
 	public void end_process()
@@ -88,10 +112,7 @@ class ListenNetwork extends Thread implements Runnable /*
 				switch (body.get("request_type"))
 				{
 					case "ATTENDANCE_COUNT":
-						String user_id = body.get("user_id");
-						String user_name = body.get("user_name");
-
-						System.out.println(user_id + " " + user_name);
+						Main.set_attendance(body.get("user_id"), true);
 						break;
 					case "REGISTER_NEW_USER_I":
 					case "GLOBAL_TEXT_MESSAGE":

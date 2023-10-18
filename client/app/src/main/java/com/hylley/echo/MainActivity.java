@@ -5,18 +5,13 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity
 {
-    Client client;
+    Client client = new Client("girlhood04");
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this.client = new Client(
-            findViewById(R.id.name_input),
-            findViewById(R.id.id_input)
-        );
 
         client.start();
     }

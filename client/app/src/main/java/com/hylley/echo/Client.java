@@ -15,20 +15,12 @@ class Client extends Thread implements Runnable
 {
     private static final int LISTEN_PORT = 6969;
     private static final int SEND_PORT = 6968;
+    public static String id;
+    private static InetAddress server_address;
 
-    private InetAddress server_address;
     private boolean keep_listening = true;
 
-    //region Inputs
-    EditText name_input;
-    EditText id_input;
-    //endregion
-
-    public Client(EditText name_input, EditText id_input)
-    {
-        this.name_input = name_input;
-        this.id_input = id_input;
-    }
+    public Client(String id) { Client.id = id; }
 
     @Override
     public void run()
@@ -43,13 +35,14 @@ class Client extends Thread implements Runnable
                 socket.receive(received_packet);
 
                 String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
-                server_address = received_packet.getAddress();
-                if(server_address == null) continue;
+                Client.server_address = received_packet.getAddress();
+
+                if(Client.server_address == null) continue;
 
                 switch (message)
                 {
                     case "ATTENDANCE_COUNT":
-                        ping_attendance();
+                        Client.ping_attendance();
                         break;
                     case "GLOBAL_TEXT_MESSAGE":
                     case "GLOBAL_FILE_MESSAGE":
@@ -63,17 +56,16 @@ class Client extends Thread implements Runnable
         catch (IOException e) { throw new RuntimeException(e); }
     }
 
-    private void ping_attendance() throws IOException
+    private static void ping_attendance() throws IOException
     {
-        if(server_address == null) return;
+        if(Client.server_address == null) return;
 
-        Socket socket = new Socket(server_address, SEND_PORT);
+        Socket socket = new Socket(Client.server_address, SEND_PORT);
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()); output.flush();
 
         Map<String, String> body = new HashMap<>();
-        body.put("request_type", "ATTENDANCE_COUNT"             );
-        body.put("user_id"     , id_input.getText().toString()  );
-        body.put("user_name"   , name_input.getText().toString());
+        body.put("request_type", "ATTENDANCE_COUNT");
+        body.put("user_id"     , Client.id         );
 
         output.writeObject(body);
         output.close(); socket.close();
