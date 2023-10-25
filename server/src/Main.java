@@ -13,6 +13,8 @@ public final class Main /*
 	public static final Dashboard window = new Dashboard();
 	public static String[] form_data = new String[]{ "matrícula", "nome" };
 
+	public static final boolean debug = true;
+
 	public static void main(String[] args) { }
 
 	@SuppressWarnings("unused")
@@ -20,8 +22,8 @@ public final class Main /*
 
 	public static void set_attendance(String echo_id)
 	{
-		System.out.println(echo_id);
 		window.update_echoes_list(new String[]{ echo_id });
+		if(debug) System.out.println("E: " + echo_id);
 	}
 
 	public static BufferedImage get_data_format_qr()

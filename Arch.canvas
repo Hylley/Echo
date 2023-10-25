@@ -1,0 +1,29 @@
+{
+	"nodes":[
+		{"id":"2ee22cdb484a2f1d","x":-600,"y":-40,"width":1300,"height":1060,"type":"group","label":"Rede / Back"},
+		{"id":"eb61812b753aecda","x":-200,"y":-860,"width":400,"height":400,"type":"group","label":"Interface / Front"},
+		{"id":"9e5901feaf858861","x":-145,"y":-260,"width":280,"height":120,"type":"text","text":"# Main\nPonto de partida do programa"},
+		{"id":"337d54b965c81dc0","x":-515,"y":240,"width":290,"height":240,"type":"text","text":"# Listen Network\nClasse responsável por ouvir a porta P1 e lidar com, da forma necessária.\nResponsável por popular a PingQueue com as requisições necessárias."},
+		{"id":"f45a90a9a203bbb5","x":-152,"y":0,"width":295,"height":160,"type":"text","text":"# Server\nClasse principal responsável por admnistrar os outros processos de rede."},
+		{"id":"7f5b2ea80f1d353b","x":-130,"y":285,"width":250,"height":150,"type":"text","text":"### Ping Queue\nFila para requisições a serem feitas pelo Ping Network"},
+		{"id":"7bd2ffb389236cff","x":-70,"y":1100,"width":131,"height":60,"type":"text","text":"Sockets"},
+		{"id":"4de3d202a9371f1a","x":-129,"y":720,"width":250,"height":220,"type":"text","text":"# DeliverAPI\nAbstração do Socket net API em Java para se encaixar com as necessidades do programa"},
+		{"id":"303b2a4a84085924","x":335,"y":120,"width":300,"height":480,"type":"text","text":"# Ping Network\nClasse responsável por enviar pacotes aos clientes. Também lida com o protocolo de descoberta."},
+		{"id":"b05d0a7a8c0194a8","x":353,"y":300,"width":265,"height":270,"type":"text","text":"### Discovery Protocol\nProtocolo responsável por transmitir para toda a rede um pacote de identificação que apenas os nós com o aplicativo Echo respondem. Podendo assim identificar os clientes ativos da rede."}
+	],
+	"edges":[
+		{"id":"bd03072ec6bb979d","fromNode":"4de3d202a9371f1a","fromSide":"top","toNode":"337d54b965c81dc0","toSide":"bottom"},
+		{"id":"6c65905a251c2396","fromNode":"337d54b965c81dc0","fromSide":"bottom","toNode":"4de3d202a9371f1a","toSide":"top"},
+		{"id":"768c21f0b0649900","fromNode":"4de3d202a9371f1a","fromSide":"top","toNode":"303b2a4a84085924","toSide":"bottom"},
+		{"id":"43ae3b0c1fd39818","fromNode":"303b2a4a84085924","fromSide":"bottom","toNode":"4de3d202a9371f1a","toSide":"top"},
+		{"id":"c1dfbe4065a3a9cc","fromNode":"4de3d202a9371f1a","fromSide":"bottom","toNode":"7bd2ffb389236cff","toSide":"top"},
+		{"id":"d606ead49b8599b8","fromNode":"7bd2ffb389236cff","fromSide":"top","toNode":"4de3d202a9371f1a","toSide":"bottom"},
+		{"id":"82dba2f79f9c2f2c","fromNode":"337d54b965c81dc0","fromSide":"right","toNode":"7f5b2ea80f1d353b","toSide":"left"},
+		{"id":"44fd7dfd053551b3","fromNode":"7f5b2ea80f1d353b","fromSide":"right","toNode":"303b2a4a84085924","toSide":"left"},
+		{"id":"ddb9307d039816c2","fromNode":"9e5901feaf858861","fromSide":"top","toNode":"eb61812b753aecda","toSide":"bottom"},
+		{"id":"be48f0bef76cf0fd","fromNode":"9e5901feaf858861","fromSide":"bottom","toNode":"f45a90a9a203bbb5","toSide":"top"},
+		{"id":"74f157e970b9ba1e","fromNode":"f45a90a9a203bbb5","fromSide":"bottom","toNode":"337d54b965c81dc0","toSide":"top"},
+		{"id":"aaa7b994712fb703","fromNode":"f45a90a9a203bbb5","fromSide":"bottom","toNode":"7f5b2ea80f1d353b","toSide":"top"},
+		{"id":"e8a7bb8d4adca5a9","fromNode":"f45a90a9a203bbb5","fromSide":"bottom","toNode":"303b2a4a84085924","toSide":"top"}
+	]
+}

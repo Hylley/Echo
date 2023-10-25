@@ -1,17 +1,17 @@
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
+import javax.swing.*;
+import java.io.*;
 import java.net.UnknownHostException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.io.ObjectInputStream;
-import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
+import java.util.List;
 
 
 public final class Server
@@ -25,6 +25,9 @@ public final class Server
 	public static final int SEND_PORT = 6969;
 	public static final int LISTEN_PORT = 6968;
 
+	public static ServerSocket server_socket;
+	public static List<InetAddress> tcp_clients = new CopyOnWriteArrayList<>(); // Thread-safe API. Eu fiz o dever de casa ;)
+
 	PingNetwork pingNetwork = new PingNetwork(); // Envia pacotes para toda a rede (UDP) —> thread principal;
 	ListenNetwork listenNetwork = new ListenNetwork(); // Recebe pacotes dos clientes individualmente (TCP) —> thread paralela.
 	ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -33,13 +36,23 @@ public final class Server
 	{
 		try
 		{
-			System.out.println("Hosting at:  	" + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
-			System.out.println("Listening at:	" + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
+			Server.server_socket = new ServerSocket(Server.LISTEN_PORT);
+
+			if(Main.debug) // Como diabos eu uso guard-clauses dentro de um try-catch??
+			{
+				System.out.println("Hosting at:  	" + InetAddress.getLocalHost().getHostAddress() + " " + SEND_PORT);
+				System.out.println("Listening at:	" + InetAddress.getLocalHost().getHostAddress() + " " + LISTEN_PORT);
+			}
 		}
-		catch (UnknownHostException e) { throw new RuntimeException(e); }
+		catch (IOException e) { throw new RuntimeException(e); }
 
 		executor.scheduleAtFixedRate(pingNetwork, 0, BROADCAST_PERIOD_IN_SECONDS, TimeUnit.SECONDS);
 		listenNetwork.start();
+	}
+
+	public void send_package(InetAddress address, String data)
+	{
+
 	}
 
 	public static byte[] get_data_register_binaries() /*
@@ -61,7 +74,7 @@ public final class Server
 				Alternativas mais viáveis para produção seriam (1) uma classe contêiner especialmente feita para segurar
 				esses dados ou (2) um vetor simples com os itens cuidadosamente posicionados. Um problema com a primeira
 				é ter de sincronizar as definições das classes em ambos os programas (além de desistir de
-				retrocompatibilidade com qualquer mínima alteração); e a segunda só falta legibilidade mesmo.
+				retrocompatibilidade com qualquer mínima alteração); e a segunda só falta de legibilidade mesmo.
 			*/
 			config.put("host", InetAddress.getLocalHost().getHostAddress());
 			config.put("port", String.valueOf(LISTEN_PORT));
@@ -81,6 +94,8 @@ public final class Server
 	{
 		listenNetwork.keep_listening = false;
 		executor.shutdown();
+
+		if(Main.debug) System.out.println("End server process");
 	}
 }
 
@@ -89,16 +104,29 @@ class PingNetwork implements Runnable
 	@Override
 	public void run()
 	{
-		try( DatagramSocket socket = new DatagramSocket() )
+		if(Main.debug) System.out.println("Sending discovery package");
+		try( DatagramSocket datagram = new DatagramSocket() )
 		{
-			socket.setBroadcast(true);
-			String message = "ATTENDANCE_COUNT";
-			InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP.
+			datagram.setBroadcast(true);
+			String message = "DISCOVERY_S";
+			InetAddress ip_broadcast = InetAddress.getByName("255.255.255.255"); // IP de broadcast UDP. 224.0.2.60 também pode funcionar.
 
 			DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), ip_broadcast, Server.SEND_PORT);
-			socket.send(packet);
+			datagram.send(packet);
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
+
+		if(Main.debug) System.out.println("Pinging intnet");
+		for(InetAddress client : Server.tcp_clients)
+		{
+			try( Socket socket = new Socket(client, Server.SEND_PORT) )
+			{
+				if(Main.debug) System.out.println("Pinging: " + client);
+				OutputStream output = socket.getOutputStream();
+				output.write("OIIIIIIIIii".getBytes());
+			}
+			catch (IOException e) { throw new RuntimeException(e); }
+		}
 	}
 }
 
@@ -117,23 +145,28 @@ class ListenNetwork extends Thread implements Runnable /*
 	@Override
 	public void run()
 	{
-		try( ServerSocket server_socket = new ServerSocket(Server.LISTEN_PORT) )
+		try
 		{
 			do
 			{
-				Socket client_socket = server_socket.accept();
+				Socket client_socket = Server.server_socket.accept(); if(Main.debug) System.out.println("Received package: " + client_socket.getInetAddress());
 				ObjectInputStream input = new ObjectInputStream(client_socket.getInputStream());
 				@SuppressWarnings("unchecked") HashMap<String, String> body = (HashMap<String, String>) input.readObject();
 
 				switch (body.get("request_type"))
 				{
+					case "DISCOVERY_C":
+						Server.tcp_clients.add(client_socket.getInetAddress());
+						if(Main.debug) System.out.println("Connected to: " + client_socket.getInetAddress() + " (" + Server.tcp_clients + ")");
+						break;
 					case "ATTENDANCE_COUNT":
 						Main.set_attendance(body.get("echo_id"));
 						break;
+					case "GLOBAL_CHAT_GET":
+
+					case "GLOBAL_CHAT_PUT":
 					case "REGISTER_NEW_USER_I":
-					case "GLOBAL_TEXT_MESSAGE":
-					case "GLOBAL_FILE_MESSAGE":
-					default: System.out.println("Err: Invalid request type;"); break;
+					default: if(Main.debug) System.out.println("Err.: Invalid request type: " + body); break;
 				}
 			}
 			while (keep_listening);
