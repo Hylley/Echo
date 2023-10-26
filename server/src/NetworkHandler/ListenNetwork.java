@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public final class ListenNetwork extends Thread implements Runnable
 {
@@ -20,7 +21,7 @@ public final class ListenNetwork extends Thread implements Runnable
 	@Override
 	public void run()
 	{
-		while(!server_socket.isClosed())
+		do
 		{
 			try
 			{
@@ -30,14 +31,20 @@ public final class ListenNetwork extends Thread implements Runnable
 				if(Server.debug) System.out.println("[" + new_client_connection.getInetAddress() + " ] is trying to connect as [" + id + "]");
 				server_instance.connect(new_client_connection, id);
 			}
+			catch(SocketException e)
+			{
+				if(!server_socket.isClosed()) throw new RuntimeException(e);
+				if(Server.debug) System.out.println("Closing ServerSocket successfully");
+			}
 			catch (IOException e) { throw new RuntimeException(e); }
 		}
+		while(!server_socket.isClosed());
 	}
 
 	public void shut()
 	{
 		try { server_socket.close(); }
 		catch (IOException e) { throw new RuntimeException(e); }
-		if(Server.debug) System.out.println("Listen network shutdown");
+		if(Server.debug) System.out.println("Closing ListenNetwork successfully");
 	}
 }

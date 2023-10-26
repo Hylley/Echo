@@ -52,6 +52,6 @@ public final class PingNetwork extends Thread implements Runnable
 	public void shut()
 	{
 		executor.shutdown();
-		if(Server.debug) System.out.println("Ping network shutdown");
+		if(Server.debug) System.out.println("Closing PingNetwork successfully");
 	}
 }

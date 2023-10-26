@@ -50,6 +50,11 @@ public final class Server
 		Server.connections.add(new_echo);
 	}
 
+	public static int connections()
+	{
+		return connections.size();
+	}
+
 	public static void handle_request(HashMap<String, String> body, Echo origin) /*
 		Quando uma thread cliente receber um novo pacote, esse método estático vai ser chamado.
 	*/
@@ -106,9 +111,9 @@ public final class Server
 
 	public void shut()
 	{
-		if(debug) System.out.println("Closing server");
-		for(Echo echo : connections) Echo.shut(echo);
 		ping_net.shut();
 		listen_net.shut();
+		for(Echo echo : connections) Echo.shut(echo);
+		if(debug) System.out.println("Closing Server successfully");
 	}
 }

@@ -8,6 +8,7 @@ public class Main
 	public static final boolean debug = true;
 
 	static Server server = new Server(debug); // Tem como ser mais explícito?
+	public static final Dashboard window = new Dashboard();
 
 	public static void main(String[] args)
 	{
@@ -21,7 +22,7 @@ public class Main
 
 	public static void shut()
 	{
+		if(debug) System.out.println("---------------------\nStarting closing procedure");
 		server.shut();
-		if(debug) System.out.println("Starting closing procedure");
 	}
 }

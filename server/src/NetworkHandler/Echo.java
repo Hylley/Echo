@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
 public final class Echo extends Thread implements Runnable /*
@@ -19,6 +20,7 @@ public final class Echo extends Thread implements Runnable /*
 {
 	public final Socket socket;
 	public final String id;
+	static int echo_count = 0;
 
 	public Echo(Socket socket, String username)
 	{
@@ -40,6 +42,12 @@ public final class Echo extends Thread implements Runnable /*
 				NetworkHandler.Server.handle_request(request, this);
 			}
 		}
+		catch (SocketException e)
+		{
+			echo_count++;
+			if(!socket.isClosed()) throw new RuntimeException(e);
+			if(Server.debug) System.out.println("[" + echo_count + "/" + Server.connections() + "] Closing Echo socket successfully");
+		}
 		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}
 
@@ -54,12 +62,7 @@ public final class Echo extends Thread implements Runnable /*
 
 	public static void shut(Echo echo)
 	{
-		try
-		{
-			echo.socket.close();
-		}
+		try { echo.socket.close(); }
 		catch (IOException e) { throw new RuntimeException(e); }
-
-		if(Server.debug) System.out.println("Echo shutdown");
 	}
 }

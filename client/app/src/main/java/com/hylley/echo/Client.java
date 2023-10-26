@@ -56,8 +56,8 @@ class Client extends Thread implements Runnable
                 broadcast.receive(received_packet);
 
                 ObjectInputStream input_stream = new ObjectInputStream(
-                                                    new BufferedInputStream( // FUCK YOU JAVA JUST CREATED THE CLASS NESTING.
-                                                            new ByteArrayInputStream(data_buffer))); // Meu programador C interno grita de dor.
+                                                    new BufferedInputStream( // FUCK YOU, JAVA JUST CREATED THE CLASS NESTING.
+                                                            new ByteArrayInputStream(data_buffer))); // Meu programador C interno grita em agonia.
 
                 String message = (String)input_stream.readObject();
                 if(MainActivity.debug) System.out.println("Received package: " + message);
@@ -69,7 +69,7 @@ class Client extends Thread implements Runnable
 
         if(MainActivity.debug) System.out.println("Find server at: " + Client.server_address);
 
-        // Informa ao servidor o ID do cliente
+        // Informa ao servidor o ID do cliente para se conectar
         try
         {
             if(MainActivity.debug) System.out.println("Connecting...");
@@ -84,25 +84,13 @@ class Client extends Thread implements Runnable
         catch (IOException e) { throw new RuntimeException(e); }
     }
 
-    private static void ping_attendance() throws IOException
+    public void send(Object packet)
     {
-        if(Client.server_address == null)
+        try(ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()))
         {
-            System.out.println("Err.: Invalid server address null");
-            return;
-        };
-
-        Socket socket = new Socket(Client.server_address, SEND_PORT);
-        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()); output.flush();
-
-        Map<String, String> body = new HashMap<>();
-        body.put("request_type", "ATTENDANCE_COUNT");
-        body.put("echo_id"     , Client.id         );
-
-        output.writeObject(body);
-        output.close(); socket.close();
-
-        if(MainActivity.debug) System.out.println("Attendance response to: " + Client.server_address + " at " + SEND_PORT);
+            output.writeObject(packet);
+        }
+        catch (IOException e) { throw new RuntimeException(e); }
     }
 
     public void end_process()
