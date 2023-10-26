@@ -1,12 +1,12 @@
 package NetworkHandler;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Echo extends Thread implements Runnable /*
 	Não me entenda errado. Não estou tentando me exibir e mostrar que sei usar multi-threading. O método para escutar a
@@ -20,7 +20,7 @@ public final class Echo extends Thread implements Runnable /*
 {
 	public final Socket socket;
 	public final String id;
-	static int echo_count = 0;
+	static AtomicInteger echo_shutdown_count = new AtomicInteger(0); // Thread-safe API; eu fiz o meu dever de casa ;)
 
 	public Echo(Socket socket, String username)
 	{
@@ -44,9 +44,10 @@ public final class Echo extends Thread implements Runnable /*
 		}
 		catch (SocketException e)
 		{
-			echo_count++;
 			if(!socket.isClosed()) throw new RuntimeException(e);
-			if(Server.debug) System.out.println("[" + echo_count + "/" + Server.connections() + "] Closing Echo socket successfully");
+
+			// Eu faria isso tão mais elegante se Java tivesse preprocessor....
+			if(Server.debug) System.out.println("[" + echo_shutdown_count.incrementAndGet() + "/" + Server.connections() + "] Closing Echo socket successfully");
 		}
 		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}

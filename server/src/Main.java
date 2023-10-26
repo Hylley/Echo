@@ -7,8 +7,8 @@ public class Main
 {
 	public static final boolean debug = true;
 
-	static Server server = new Server(debug); // Tem como ser mais explícito?
-	public static final Dashboard window = new Dashboard();
+	static Server server = new Server(debug); // Tem como ser mais explícito que isso???
+	@SuppressWarnings("unused") public static final Dashboard window = new Dashboard();
 
 	public static void main(String[] args)
 	{

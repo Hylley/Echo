@@ -39,7 +39,7 @@ public final class Server
 		if(debug) System.out.println("Server instance started");
 	}
 
-	private static final List<Echo> connections = new CopyOnWriteArrayList<>(); // Thread-safe API. Eu fiz o meu dever de casa ;)
+	private static final List<Echo> connections = new CopyOnWriteArrayList<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
 
 	public void connect(Socket new_socket, String id) /*
 		Quando o ListenNetwork escutar uma nova conexão, esse método estático vai ser chamado.
