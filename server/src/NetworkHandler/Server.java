@@ -41,15 +41,13 @@ public final class Server
 
 	private static final List<Echo> connections = new CopyOnWriteArrayList<>(); // Thread-safe API. Eu fiz o meu dever de casa ;)
 
-	public void connect(Socket new_socket, String username) /*
+	public void connect(Socket new_socket, String id) /*
 		Quando o ListenNetwork escutar uma nova conexão, esse método estático vai ser chamado.
 	*/
 	{
-		Echo new_echo = new Echo(new_socket, username);
+		Echo new_echo = new Echo(new_socket, id);
 		new_echo.start();
 		Server.connections.add(new_echo);
-
-		if(debug) System.out.println("New client connected: " + new_socket.getInetAddress());
 	}
 
 	public static void handle_request(HashMap<String, String> body, Echo origin) /*
@@ -60,7 +58,7 @@ public final class Server
 		{
 			case "GLOBAL_TEXT_MESSAGE":
 				HashMap<String, String> message = new HashMap<>();
-				message.put("name", origin.username);
+				message.put("name", origin.id);
 				message.put("text", body.get("text"));
 
 				for(Echo echo : connections) Echo.send(echo, message);

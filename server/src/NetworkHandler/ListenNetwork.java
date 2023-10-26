@@ -22,11 +22,13 @@ public final class ListenNetwork extends Thread implements Runnable
 	{
 		while(!server_socket.isClosed())
 		{
-			try(Socket new_client_connection = server_socket.accept())
+			try
 			{
+				Socket new_client_connection = server_socket.accept();
 				BufferedReader input = new BufferedReader(new InputStreamReader(new_client_connection.getInputStream()));
-				String username = input.readLine();
-				server_instance.connect(new_client_connection, username);
+				String id = input.readLine();
+				if(Server.debug) System.out.println("[" + new_client_connection.getInetAddress() + " ] is trying to connect as [" + id + "]");
+				server_instance.connect(new_client_connection, id);
 			}
 			catch (IOException e) { throw new RuntimeException(e); }
 		}

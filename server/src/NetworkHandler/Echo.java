@@ -1,5 +1,6 @@
 package NetworkHandler;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,28 +18,20 @@ public final class Echo extends Thread implements Runnable /*
 */
 {
 	public final Socket socket;
-	public final String username;
-
-	private final ObjectInputStream input;
-	private final ObjectOutputStream output;
+	public final String id;
 
 	public Echo(Socket socket, String username)
 	{
 		this.socket = socket;
-		this.username = username;
+		this.id = username;
 
-		try
-		{
-			this.input = new ObjectInputStream(socket.getInputStream());
-			this.output = new ObjectOutputStream(socket.getOutputStream());
-		}
-		catch (IOException e) { throw new RuntimeException(e); }
+		if(Server.debug) System.out.println("New client [" + id + "] connected at [" + socket.getInetAddress() + "]");
 	}
 
 	@Override
 	public void run()
 	{
-		try
+		try(ObjectInputStream input = new ObjectInputStream(socket.getInputStream()))
 		{
 			while(!socket.isClosed())
 			{
@@ -52,9 +45,9 @@ public final class Echo extends Thread implements Runnable /*
 
 	public static void send(Echo echo, Object packet)
 	{
-		try
+		try(ObjectOutputStream output = new ObjectOutputStream(echo.socket.getOutputStream()))
 		{
-			echo.output.writeObject(packet);
+			output.writeObject(packet);
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
 	}
@@ -63,8 +56,6 @@ public final class Echo extends Thread implements Runnable /*
 	{
 		try
 		{
-			echo.input.close();
-			echo.output.close();
 			echo.socket.close();
 		}
 		catch (IOException e) { throw new RuntimeException(e); }

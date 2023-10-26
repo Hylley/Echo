@@ -1,13 +1,22 @@
 package com.hylley.echo;
 
+import android.renderscript.ScriptGroup;
 import android.widget.EditText;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -18,12 +27,17 @@ import java.util.Map;
 
 class Client extends Thread implements Runnable
 {
+    //region Constants
     private static final int LISTEN_PORT = 6969;
     private static final int SEND_PORT = 6968;
+    //endregion
+
     public static String id;
     private static InetAddress server_address;
 
-    private boolean keep_listening = true;
+    private Socket socket;
+    private InputStream input;
+    private OutputStream output;
 
     public Client(String id) { Client.id = id; }
 
@@ -31,6 +45,7 @@ class Client extends Thread implements Runnable
     public void run()
     {
         // Escuta pacotes de descoberta através de UDP
+        if(MainActivity.debug) System.out.println("Searching for broadcast");
         try( DatagramSocket broadcast = new DatagramSocket(LISTEN_PORT) )
         {
             byte[] data_buffer = new byte[1024];
@@ -40,41 +55,31 @@ class Client extends Thread implements Runnable
                 DatagramPacket received_packet = new DatagramPacket(data_buffer, data_buffer.length);
                 broadcast.receive(received_packet);
 
-                String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
+                ObjectInputStream input_stream = new ObjectInputStream(
+                                                    new BufferedInputStream( // FUCK YOU JAVA JUST CREATED THE CLASS NESTING.
+                                                            new ByteArrayInputStream(data_buffer))); // Meu programador C interno grita de dor.
 
-
-                if(!message.equals("DISCOVERY")) continue;
-                Client.server_address = received_packet.getAddress();
-                if(Client.server_address == null) continue;
-
-
-                Socket socket = new Socket(Client.server_address, SEND_PORT);
-                ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()); output.flush();
-
-                Map<String, String> body = new HashMap<>();
-                body.put("request_type", "DISCOVERY_C");
-
-                output.writeObject(body);
-                output.close(); socket.close();
-
-                break;
+                String message = (String)input_stream.readObject();
+                if(MainActivity.debug) System.out.println("Received package: " + message);
+                if(message.equals("DISCOVERY")) Client.server_address = received_packet.getAddress();
             }
-            while (keep_listening);
+            while (server_address == null);
         }
-        catch (IOException e) { throw new RuntimeException(e); }
+        catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 
-        if(MainActivity.debug) System.out.println("Client connected to: " + Client.server_address);
+        if(MainActivity.debug) System.out.println("Find server at: " + Client.server_address);
 
-        // Escuta pacotes do servidor
-        try (Socket socket = new Socket(Client.server_address, LISTEN_PORT))
+        // Informa ao servidor o ID do cliente
+        try
         {
-            do
-            {
-                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String message = input.readLine();
-                System.out.println("Server: " + message);
-            }
-            while (keep_listening);
+            if(MainActivity.debug) System.out.println("Connecting...");
+            socket = new Socket(Client.server_address, SEND_PORT);
+            BufferedWriter writter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+            // append and flush in logical chunks
+            writter.append(id).append("\n");
+            writter.append("appending more before flushing").append("\n");
+            writter.flush();
         }
         catch (IOException e) { throw new RuntimeException(e); }
     }
@@ -102,7 +107,11 @@ class Client extends Thread implements Runnable
 
     public void end_process()
     {
-        keep_listening = false;
+        try
+        {
+            socket.close();
+        }
+        catch (IOException e) { throw new RuntimeException(e); }
         if(MainActivity.debug) System.out.println("End client process");
     }
 }
