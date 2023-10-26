@@ -43,7 +43,7 @@ class Client extends Thread implements Runnable
                 String message = new String(received_packet.getData(), received_packet.getOffset(), received_packet.getLength());
 
 
-                if(!message.equals("DISCOVERY_S")) continue;
+                if(!message.equals("DISCOVERY")) continue;
                 Client.server_address = received_packet.getAddress();
                 if(Client.server_address == null) continue;
 

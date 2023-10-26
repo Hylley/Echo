@@ -13,10 +13,10 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Arch.canvas",
+                "file": "Architecture.canvas",
                 "viewState": {
-                  "x": 140.6807697332377,
-                  "y": 465.6914802900424,
+                  "x": 154.616684020876,
+                  "y": 418.4104628691318,
                   "zoom": -0.3333333333333334
                 }
               }
@@ -88,7 +88,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Arch.canvas",
+                "file": "Architecture.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -105,7 +105,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Arch.canvas",
+                "file": "Architecture.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -128,7 +128,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Arch.canvas"
+                "file": "Architecture.canvas"
               }
             }
           }
@@ -151,19 +151,20 @@
   },
   "active": "c190a122136a8de4",
   "lastOpenFiles": [
-    "Dashboard.md",
-    "Arch.canvas",
-    "server/src/Server.java~",
+    "server/src/NetworkHandler/ListenNetwork.java~",
+    "server/src/NetworkHandler/Server.java~",
+    "server/src/NetworkHandler/PingNetwork.java~",
     "client/app/src/main/java/com/hylley/echo/Client.java~",
-    "server/src/MessageService.java~",
-    "server/src/Message.java~",
-    "server/src/Message.java",
-    "server/src/MessageService.java",
-    "client/app/src/main/java/com/hylley/echo/MainActivity.java~",
-    "resources/projeto_de_extensao.pdf",
-    "server/src/Main.java~",
+    "server/src/NetworkHandler/PingNetwork.java",
+    "server/src/NetworkHandler/Echo.java~",
+    "server/src/NetworkHandler/Echo.java",
+    "server/src/NetworkHandler/ListenNetwork.java",
+    "server/src/DeliverAPI/Mailman.java",
+    "server/src/DeliverAPI/DeliverAPI.java~",
+    "server/src/DeliverAPI/DeliverAPI.java",
+    "Dashboard.md",
+    "Architecture.canvas",
     "README.md",
-    "server/out/production/Server/ListenNetwork.class",
     "Leitor de QR no cliente que identifica os dados do servidor lido.md",
     "Sem título.md"
   ]

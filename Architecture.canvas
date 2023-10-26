@@ -1,6 +1,6 @@
 {
 	"nodes":[
-		{"id":"2ee22cdb484a2f1d","x":-600,"y":-40,"width":1300,"height":1060,"type":"group","label":"Rede / Back"},
+		{"id":"2ee22cdb484a2f1d","x":-600,"y":-40,"width":1300,"height":720,"type":"group","label":"Network Handler"},
 		{"id":"eb61812b753aecda","x":-200,"y":-860,"width":400,"height":400,"type":"group","label":"Interface / Front"},
 		{"id":"9e5901feaf858861","x":-145,"y":-260,"width":280,"height":120,"type":"text","text":"# Main\nPonto de partida do programa"},
 		{"id":"337d54b965c81dc0","x":-515,"y":240,"width":290,"height":240,"type":"text","text":"# Listen Network\nClasse responsável por ouvir a porta P1 e lidar com, da forma necessária.\nResponsável por popular a PingQueue com as requisições necessárias."},
