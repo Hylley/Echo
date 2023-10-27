@@ -1,8 +1,6 @@
 package NetworkHandler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -26,17 +24,17 @@ public final class ListenNetwork extends Thread implements Runnable
 			try
 			{
 				Socket new_client_connection = server_socket.accept();
-				BufferedReader input = new BufferedReader(new InputStreamReader(new_client_connection.getInputStream()));
-				String id = input.readLine();
+				ObjectInputStream input = new ObjectInputStream(new_client_connection.getInputStream());
+				String id = (String) input.readObject();
 				if(Server.debug) System.out.println("[" + new_client_connection.getInetAddress() + " ] is trying to connect as [" + id + "]");
-				server_instance.connect(new_client_connection, id);
+				server_instance.connect(new_client_connection, input, id);
 			}
 			catch(SocketException e)
 			{
 				if(!server_socket.isClosed()) throw new RuntimeException(e);
 				if(Server.debug) System.out.println("Closing ServerSocket successfully");
 			}
-			catch (IOException e) { throw new RuntimeException(e); }
+			catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 		}
 		while(!server_socket.isClosed());
 	}

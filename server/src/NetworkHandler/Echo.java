@@ -19,12 +19,15 @@ public final class Echo extends Thread implements Runnable /*
 */
 {
 	public final Socket socket;
+	ObjectInputStream input;
+
 	public final String id;
 	static AtomicInteger echo_shutdown_count = new AtomicInteger(0); // Thread-safe API; eu fiz o meu dever de casa ;)
 
-	public Echo(Socket socket, String username)
+	public Echo(Socket socket, ObjectInputStream input, String username)
 	{
 		this.socket = socket;
+		this.input = input;
 		this.id = username;
 
 		if(Server.debug) System.out.println("New client [" + id + "] connected at [" + socket.getInetAddress() + "]");
@@ -35,8 +38,6 @@ public final class Echo extends Thread implements Runnable /*
 	{
 		try
 		{
-			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-
 			do
 			{
 				@SuppressWarnings("unchecked")

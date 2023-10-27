@@ -2,6 +2,7 @@ package com.hylley.echo.network_handler;
 
 import com.hylley.echo.MainActivity;
 
+import java.io.Console;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 
 public class ClientListener extends Thread implements Runnable
 {
+    ObjectInputStream input;
+
     @Override @SuppressWarnings("ConstantConditions")
     public void run()
     {
@@ -16,8 +19,9 @@ public class ClientListener extends Thread implements Runnable
         {
             try
             {
-                ObjectInputStream input = new ObjectInputStream(Client.socket.getInputStream());
+                input = new ObjectInputStream(Client.socket.getInputStream());
                 @SuppressWarnings("unchecked") HashMap<String, String> packet = (HashMap<String, String>) input.readObject();
+                if(MainActivity.debug) System.out.println("New package received: " + packet);
 
                 switch (packet.get("request_type"))
                 {

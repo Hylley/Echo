@@ -3,18 +3,16 @@ package com.hylley.echo.network_handler;
 import com.hylley.echo.MainActivity;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -31,6 +29,7 @@ public class Client extends Thread implements Runnable
     public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>();
 
     public static Socket socket;
+    private static ObjectOutputStream output;
 
     static MainActivity main_activity;
 
@@ -75,14 +74,12 @@ public class Client extends Thread implements Runnable
         {
             if(MainActivity.debug) System.out.println("Connecting...");
             socket = new Socket(Client.server_address, SEND_PORT);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            output = new ObjectOutputStream(socket.getOutputStream());
 
-            // append and flush in logical chunks
-            writer.append(id).append("\n");
-            writer.append("appending more before flushing").append("\n");
-            writer.flush();
+            output.writeObject(id);
         }
         catch (IOException e) { throw new RuntimeException(e); }
+        if(MainActivity.debug) System.out.println("Connected");
 
         // Escuta por novas instruções do servidor
         listener = new ClientListener(); listener.start();
@@ -90,9 +87,12 @@ public class Client extends Thread implements Runnable
         // Envia os pacotes da fila
         do
         {
-            for (HashMap<String, String> packet : packet_queue)
+            Iterator<HashMap<String, String>> iterator = packet_queue.iterator();
+            while (iterator.hasNext())
             {
+                HashMap<String, String> packet = iterator.next();
                 send(packet);
+                iterator.remove();
             }
         }
         while (!socket.isClosed());
@@ -102,7 +102,6 @@ public class Client extends Thread implements Runnable
     {
         try
         {
-            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             output.writeObject(packet);
         }
         catch (IOException e) { throw new RuntimeException(e); }

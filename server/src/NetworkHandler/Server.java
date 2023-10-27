@@ -2,6 +2,7 @@ package NetworkHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -41,11 +42,11 @@ public final class Server
 
 	private static final List<Echo> connections = new CopyOnWriteArrayList<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
 
-	public void connect(Socket new_socket, String id) /*
+	public void connect(Socket new_socket, ObjectInputStream input, String id) /*
 		Quando o ListenNetwork escutar uma nova conexão, esse método estático vai ser chamado.
 	*/
 	{
-		Echo new_echo = new Echo(new_socket, id);
+		Echo new_echo = new Echo(new_socket, input, id);
 		new_echo.start();
 		Server.connections.add(new_echo);
 	}
