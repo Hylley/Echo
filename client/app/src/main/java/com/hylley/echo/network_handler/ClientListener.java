@@ -34,7 +34,7 @@ public class ClientListener extends Thread implements Runnable
             catch(SocketException e)
             {
                 if(!Client.socket.isClosed()) throw new RuntimeException(e);
-                if(MainActivity.debug) System.out.println("Closing ServerSocket successfully");
+                if(MainActivity.debug) System.out.println("Socket closed");
             }
             catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
         }

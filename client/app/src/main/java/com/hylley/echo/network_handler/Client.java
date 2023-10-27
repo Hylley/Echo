@@ -100,8 +100,9 @@ public class Client extends Thread implements Runnable
 
     public void send(Object packet)
     {
-        try(ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream()))
+        try
         {
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             output.writeObject(packet);
         }
         catch (IOException e) { throw new RuntimeException(e); }

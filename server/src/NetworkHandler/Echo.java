@@ -33,14 +33,17 @@ public final class Echo extends Thread implements Runnable /*
 	@Override
 	public void run()
 	{
-		try(ObjectInputStream input = new ObjectInputStream(socket.getInputStream()))
+		try
 		{
-			while(!socket.isClosed())
+			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+
+			do
 			{
 				@SuppressWarnings("unchecked")
 				HashMap<String, String> request = (HashMap<String, String>) input.readObject();
 				NetworkHandler.Server.handle_request(request, this);
 			}
+			while(!socket.isClosed());
 		}
 		catch (SocketException e)
 		{
@@ -54,8 +57,9 @@ public final class Echo extends Thread implements Runnable /*
 
 	public static void send(Echo echo, Object packet)
 	{
-		try(ObjectOutputStream output = new ObjectOutputStream(echo.socket.getOutputStream()))
+		try
 		{
+			ObjectOutputStream output = new ObjectOutputStream(echo.socket.getOutputStream());
 			output.writeObject(packet);
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
