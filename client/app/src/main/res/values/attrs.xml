@@ -2,6 +2,5 @@
 <resources>
     <attr name="chatMessageInputColor" format="reference" />
     <attr name="chatMessageInputHintTextColor" format="reference" />
-    <attr name="chatMessageSentBoxColor" format="reference" />
-    <attr name="chatMessageReceivedBoxColor" format="reference" />
+    <attr name="chatMessageBoxBackgroundColor" format="reference" />
 </resources>

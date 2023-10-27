@@ -14,7 +14,6 @@
         <!-- Customize your theme here. -->
         <item name="chatMessageInputColor">@color/dark_gray</item>
         <item name="chatMessageInputHintTextColor">@color/light_gray</item>
-        <item name="chatMessageSentBoxColor">@color/purple_700</item>
-        <item name="chatMessageReceivedBoxColor">@color/dark_gray</item>
+        <item name="chatMessageBoxBackgroundColor">@color/white</item>
     </style>
 </resources>

@@ -1,9 +1,18 @@
 package com.hylley.echo;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.hylley.echo.chat_handler.ChatAdapter;
+import com.hylley.echo.chat_handler.ChatFragment;
+import com.hylley.echo.chat_handler.Message;
+import com.hylley.echo.network_handler.Client;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -11,7 +20,7 @@ public class MainActivity extends AppCompatActivity
     BottomNavigationView view;
 
     FormFragment form_fragment = new FormFragment();
-    ChatFragment chat_fragment = new ChatFragment();
+    ChatFragment chat_fragment = new ChatFragment(this);
 
     static BadgeDrawable badge;
     //enregion
@@ -27,6 +36,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //region Fragments and tabs
         getSupportFragmentManager().beginTransaction().replace(R.id.container, form_fragment).commit();
         view = findViewById(R.id.navbar);
         badge = view.getOrCreateBadge(R.id.chat); badge.setVisible(false);
@@ -49,8 +59,14 @@ public class MainActivity extends AppCompatActivity
 
             return false;
         });
+        //endregion
 
         client.start();
+    }
+
+    public void send_global_message(Message message)
+    {
+        System.out.println(message);
     }
 
     @SuppressWarnings("unused")

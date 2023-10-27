@@ -1,31 +1,21 @@
-package com.hylley.echo;
+package com.hylley.echo.network_handler;
 
-import android.renderscript.ScriptGroup;
-import android.widget.EditText;
+import com.hylley.echo.MainActivity;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 
-class Client extends Thread implements Runnable
+public class Client extends Thread implements Runnable
 {
     //region Constants
     private static final int LISTEN_PORT = 6969;
