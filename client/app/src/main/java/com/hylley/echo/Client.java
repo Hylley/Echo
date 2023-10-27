@@ -36,16 +36,21 @@ class Client extends Thread implements Runnable
     private static InetAddress server_address;
 
     private Socket socket;
-    private InputStream input;
-    private OutputStream output;
 
-    public Client(String id) { Client.id = id; }
+    static MainActivity main_activity;
+
+    public Client(String id, MainActivity main_activity)
+    {
+        Client.id = id;
+        Client.main_activity = main_activity;
+    }
 
     @Override
     public void run()
     {
         // Escuta pacotes de descoberta através de UDP
         if(MainActivity.debug) System.out.println("Searching for broadcast");
+
         try( DatagramSocket broadcast = new DatagramSocket(LISTEN_PORT) )
         {
             byte[] data_buffer = new byte[1024];

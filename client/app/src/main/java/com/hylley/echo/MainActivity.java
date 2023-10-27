@@ -2,6 +2,8 @@ package com.hylley.echo;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -16,14 +18,14 @@ public class MainActivity extends AppCompatActivity
     //region App
     BottomNavigationView view;
 
-    FormFragment form_fragment = new FormFragment();
-    ChatFragment chat_fragment = new ChatFragment();
+    static FormFragment form_fragment = new FormFragment();
+    static ChatFragment chat_fragment = new ChatFragment();
 
-    BadgeDrawable badge;
+    static BadgeDrawable badge;
     //enregion
 
     //region Network
-    Client client = new Client("girlhood04");
+    Client client = new Client("girlhood04", this);
     public static final boolean debug = true;
     //endregion
 
@@ -62,12 +64,12 @@ public class MainActivity extends AppCompatActivity
         client.start();
     }
 
-    public void set_chat_icon_unread_badge(boolean visible)
+    public static void set_chat_icon_unread_badge(boolean visible)
     {
         badge.setVisible(visible);
     }
 
-    public void set_chat_icon_unread_badge(boolean visible, int pops)
+    public static void set_chat_icon_unread_badge(boolean visible, int pops)
     {
         badge.setNumber(pops);
         badge.setVisible(visible);
