@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, form_fragment).commit();
         view = findViewById(R.id.navbar);
-        badge = view.getOrCreateBadge(R.id.chat);
+        badge = view.getOrCreateBadge(R.id.chat); badge.setVisible(false);
 
         view.setOnItemSelectedListener(item ->
         {
