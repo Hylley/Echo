@@ -30,7 +30,7 @@ public final class Server
 		try
 		{
 			this.ping_net   = new PingNetwork(DISCOVERY_BROADCAST_PERIOD, SEND_PORT);
-			this.listen_net = new ListenNetwork(new ServerSocket(LISTEN_PORT), this);
+			this.listen_net = new ListenNetwork(new ServerSocket(LISTEN_PORT));
 		} catch (IOException e) { throw new RuntimeException(e); }
 
 		this.ping_net.start();
@@ -42,13 +42,18 @@ public final class Server
 
 	private static final List<Echo> connections = new CopyOnWriteArrayList<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
 
-	public void connect(Socket new_socket, ObjectInputStream input, String id) /*
+	public static void connect(Socket new_socket, ObjectInputStream input, String id) /*
 		Quando o ListenNetwork escutar uma nova conexão, esse método estático vai ser chamado.
 	*/
 	{
 		Echo new_echo = new Echo(new_socket, input, id);
 		new_echo.start();
 		Server.connections.add(new_echo);
+	}
+
+	public static void disconnect(Echo echo)
+	{
+		Server.connections.remove(echo);
 	}
 
 	public static int connections() { return connections.size(); }
@@ -61,11 +66,15 @@ public final class Server
 		{
 			case "GLOBAL_TEXT_MESSAGE":
 				HashMap<String, String> message = new HashMap<>();
+				message.put("request_type", "GLOBAL_TEXT_MESSAGE");
 				message.put("name", origin.id);
 				message.put("text", body.get("text"));
 
 				for(Echo echo : connections) Echo.send(echo, message);
 				break;
+			case "CLIENT_DISCONNECT":
+				Echo.shut(origin);
+				Server.disconnect(origin);
 			case "ATTENDANCE_COUNT":
 			case "REGISTER_NEW_USER":
 			default: System.out.println("Err: Invalid request type;"); break;

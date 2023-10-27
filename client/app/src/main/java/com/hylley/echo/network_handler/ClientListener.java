@@ -2,7 +2,7 @@ package com.hylley.echo.network_handler;
 
 import com.hylley.echo.MainActivity;
 
-import java.io.Console;
+import android.app.Activity;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
@@ -11,6 +11,12 @@ import java.util.HashMap;
 public class ClientListener extends Thread implements Runnable
 {
     ObjectInputStream input;
+    MainActivity main_activity;
+
+    public ClientListener(MainActivity main_activity)
+    {
+        this.main_activity = main_activity;
+    }
 
     @Override @SuppressWarnings("ConstantConditions")
     public void run()
@@ -30,7 +36,7 @@ public class ClientListener extends Thread implements Runnable
                         return;
                     case "GLOBAL_TEXT_MESSAGE":
                         String origin_username = packet.get("name");
-                        Client.main_activity.append_local_global_message(origin_username, packet.get("text"));
+                        main_activity.runOnUiThread(() -> Client.main_activity.append_local_global_message(origin_username, packet.get("text")));
                         break;
                     default: System.out.println("Err: Invalid request type;"); break;
                 }

@@ -1,5 +1,6 @@
 package NetworkHandler;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -50,8 +51,16 @@ public final class Echo extends Thread implements Runnable /*
 		{
 			if(!socket.isClosed()) throw new RuntimeException(e);
 
-			// Eu faria isso tão mais elegante se Java tivesse preprocessor....
+			// Eu faria isso tão mais elegante se houvessem pre-processadores em Java.
 			if(Server.debug) System.out.println("[" + echo_shutdown_count.incrementAndGet() + "/" + Server.connections() + "] Closing Echo socket successfully");
+		}
+		catch (EOFException e) /*
+			Não se engane pelo nome. A exceção de fim de arquivo nesse contexto é lançada quando
+			o cliente se desconecta repentinamente.
+		*/
+		{
+			Server.disconnect(this);
+			if(Server.debug) System.out.println("One echo was brute disconnected");
 		}
 		catch (IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
 	}

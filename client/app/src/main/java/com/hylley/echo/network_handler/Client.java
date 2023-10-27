@@ -82,7 +82,7 @@ public class Client extends Thread implements Runnable
         if(MainActivity.debug) System.out.println("Connected");
 
         // Escuta por novas instruções do servidor
-        listener = new ClientListener(); listener.start();
+        listener = new ClientListener(main_activity); listener.start();
 
         // Envia os pacotes da fila
         do
@@ -109,6 +109,10 @@ public class Client extends Thread implements Runnable
 
     public void end_process()
     {
+        HashMap<String, String> packet = new HashMap<>();
+        packet.put("request_type", "CLIENT_DISCONNECT");
+        send(packet);
+
         try
         {
             socket.close();

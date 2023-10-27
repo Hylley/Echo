@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
 
     public void append_local_global_message(String username, String message_body)
     {
-        // chat_fragment.add_message(username, message_body);
+        chat_fragment.add_message(username, message_body);
         if(debug) System.out.println("[" + username + "] " + message_body);
     }
 

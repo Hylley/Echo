@@ -8,12 +8,10 @@ import java.net.SocketException;
 public final class ListenNetwork extends Thread implements Runnable
 {
 	private final ServerSocket server_socket;
-	private final Server server_instance;
 
-	public ListenNetwork(ServerSocket server_socket, Server server_instance)
+	public ListenNetwork(ServerSocket server_socket)
 	{
 		this.server_socket = server_socket;
-		this.server_instance = server_instance;
 	}
 
 	@Override
@@ -27,7 +25,7 @@ public final class ListenNetwork extends Thread implements Runnable
 				ObjectInputStream input = new ObjectInputStream(new_client_connection.getInputStream());
 				String id = (String) input.readObject();
 				if(Server.debug) System.out.println("[" + new_client_connection.getInetAddress() + " ] is trying to connect as [" + id + "]");
-				server_instance.connect(new_client_connection, input, id);
+				Server.connect(new_client_connection, input, id);
 			}
 			catch(SocketException e)
 			{
