@@ -2,6 +2,7 @@ package com.hylley.echo;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -16,7 +17,8 @@ public class ChatFragment extends Fragment
     ScrollView scroll_view;
 
     @Override
-    public void onViewCreated(View view, @NotNull Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @NotNull Bundle savedInstanceState)
+    {
         scroll_view = getView().findViewById(R.id.chat_scroll_view);
         scroll_view.post(() -> scroll_view.scrollTo(0, scroll_view.getBottom()));
     }
