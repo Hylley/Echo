@@ -1,18 +1,16 @@
 package com.hylley.echo;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
+
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.hylley.echo.chat_handler.ChatAdapter;
 import com.hylley.echo.chat_handler.ChatFragment;
-import com.hylley.echo.chat_handler.Message;
 import com.hylley.echo.network_handler.Client;
 
-import java.util.Objects;
+import java.time.format.SignStyle;
+import java.util.HashMap;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -21,6 +19,7 @@ public class MainActivity extends AppCompatActivity
 
     FormFragment form_fragment = new FormFragment();
     ChatFragment chat_fragment = new ChatFragment(this);
+    int active_fragment;
 
     static BadgeDrawable badge;
     //enregion
@@ -43,17 +42,19 @@ public class MainActivity extends AppCompatActivity
 
         view.setOnItemSelectedListener(item ->
         {
-            int selected_id = item.getItemId();
+            int switch_fragment = item.getItemId();
 
-            if(selected_id == R.id.form)
+            if(switch_fragment == R.id.form)
             {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, form_fragment).commit();
+                active_fragment = switch_fragment;
                 return true;
             }
 
-            if(selected_id == R.id.chat)
+            if(switch_fragment == R.id.chat)
             {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, chat_fragment).commit();
+                active_fragment = switch_fragment;
                 return true;
             }
 
@@ -64,16 +65,35 @@ public class MainActivity extends AppCompatActivity
         client.start();
     }
 
-    public void send_global_message(Message message)
+    public void fragment_chat_is_ready()
     {
-        System.out.println(message);
+        if(debug) System.out.println("Chat is ready");
+    }
+
+    public void append_network_global_message(String message)
+    {
+        HashMap<String, String> packet = new HashMap<>();
+        packet.put("request_type", "GLOBAL_TEXT_MESSAGE");
+        packet.put("name", Client.id);
+        packet.put("text", message);
+        client.packet_queue.add(packet);
+    }
+
+    public void append_local_global_message(String username, String message_body)
+    {
+        // chat_fragment.add_message(username, message_body);
+        if(debug) System.out.println("[" + username + "] " + message_body);
+    }
+
+    public void restart_client()
+    {
+        client.end_process();
+        client = new Client("girlhood04", this);
+        client.start();
     }
 
     @SuppressWarnings("unused")
-    public static void set_chat_icon_unread_badge(boolean visible)
-    {
-        badge.setVisible(visible);
-    }
+    public static void set_chat_icon_unread_badge(boolean visible) { badge.setVisible(visible); }
 
     @SuppressWarnings("unused")
     public static void set_chat_icon_unread_badge(boolean visible, int pops)
@@ -89,5 +109,6 @@ public class MainActivity extends AppCompatActivity
         if(!isFinishing() || client == null) return;
 
         client.end_process();
+        if(debug) System.out.println("Process ended successfully");
     }
 }

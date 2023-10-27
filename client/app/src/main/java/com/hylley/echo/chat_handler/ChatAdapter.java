@@ -50,6 +50,7 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder>
         return chat.size();
     }
 
+    @SuppressWarnings("unused")
     public void append(Message message)
     {
         chat.add(message);
@@ -61,8 +62,17 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder>
         chat.add(new Message(username, message_body));
         int index = chat.size() - 1;
         this.notifyItemInserted(index);
+        this.scroll_to(index);
+    }
 
+    public void scroll_to(int index)
+    {
         Objects.requireNonNull(view.getLayoutManager()).scrollToPosition(index);
+    }
+
+    public void scroll_bottom()
+    {
+        this.scroll_to(chat.size() - 1);
     }
 }
 

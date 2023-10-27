@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import com.hylley.echo.MainActivity;
 import com.hylley.echo.R;
@@ -19,8 +20,12 @@ import com.hylley.echo.R;
 public class ChatFragment extends Fragment
 {
     MainActivity main_activity;
-    RecyclerView chat_recycler_view;
     EditText message_input;
+    FrameLayout send_button;
+
+    RecyclerView chat_recycler_view;
+    ChatAdapter chat_recycler_view_adapter;
+    LinearLayoutManager chat_recycler_view_manager;
 
     public ChatFragment(MainActivity main_activity)
     {
@@ -33,20 +38,38 @@ public class ChatFragment extends Fragment
     {
         chat_recycler_view = view.findViewById(R.id.recycler_view);
         message_input = view.findViewById(R.id.message_input);
+        send_button = view.findViewById(R.id.send_button);
 
-        //region Chats and messages
-        ChatAdapter chat_recycler_view_adapter = new ChatAdapter(chat_recycler_view);
-        LinearLayoutManager chat_recycler_view_manager = new LinearLayoutManager(getContext());
+        //region Chats, messages and related stuff
+        chat_recycler_view_adapter = new ChatAdapter(chat_recycler_view);
+        chat_recycler_view_manager = new LinearLayoutManager(getContext());
         chat_recycler_view.setLayoutManager(chat_recycler_view_manager);
         chat_recycler_view.setAdapter(chat_recycler_view_adapter);
         chat_recycler_view_manager.setStackFromEnd(true);
         chat_recycler_view_manager.setReverseLayout(false);
 
-        for(int i = 0; i < 50; i++)
+        message_input.setOnFocusChangeListener((v, focused) ->
         {
-            chat_recycler_view_adapter.append("Hylley", "Eu sou lindo " + i);
-        }
+            if(!focused) return;
+            chat_recycler_view_adapter.scroll_bottom();
+        });
+
+        send_button.setOnClickListener((_view) ->
+        {
+            String text = String.valueOf(message_input.getText());
+            if (text.isEmpty() || text.isBlank()) return;
+
+            main_activity.append_network_global_message(text);
+            message_input.setText("");
+        });
         //endregion
+
+        main_activity.fragment_chat_is_ready();
+    }
+
+    public void add_message(String username, String message_body)
+    {
+        chat_recycler_view_adapter.append(username, message_body);
     }
 
     @Override

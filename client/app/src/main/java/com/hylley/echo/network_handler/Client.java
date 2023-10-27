@@ -13,6 +13,9 @@ import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class Client extends Thread implements Runnable
@@ -24,8 +27,10 @@ public class Client extends Thread implements Runnable
 
     public static String id;
     private static InetAddress server_address;
+    ClientListener listener;
+    public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>();
 
-    private Socket socket;
+    public static Socket socket;
 
     static MainActivity main_activity;
 
@@ -36,6 +41,7 @@ public class Client extends Thread implements Runnable
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void run()
     {
         // Escuta pacotes de descoberta através de UDP
@@ -69,14 +75,27 @@ public class Client extends Thread implements Runnable
         {
             if(MainActivity.debug) System.out.println("Connecting...");
             socket = new Socket(Client.server_address, SEND_PORT);
-            BufferedWriter writter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             // append and flush in logical chunks
-            writter.append(id).append("\n");
-            writter.append("appending more before flushing").append("\n");
-            writter.flush();
+            writer.append(id).append("\n");
+            writer.append("appending more before flushing").append("\n");
+            writer.flush();
         }
         catch (IOException e) { throw new RuntimeException(e); }
+
+        // Escuta por novas instruções do servidor
+        listener = new ClientListener(); listener.start();
+
+        // Envia os pacotes da fila
+        do
+        {
+            for (HashMap<String, String> packet : packet_queue)
+            {
+                send(packet);
+            }
+        }
+        while (!socket.isClosed());
     }
 
     public void send(Object packet)

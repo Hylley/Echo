@@ -50,10 +50,7 @@ public final class Server
 		Server.connections.add(new_echo);
 	}
 
-	public static int connections()
-	{
-		return connections.size();
-	}
+	public static int connections() { return connections.size(); }
 
 	public static void handle_request(HashMap<String, String> body, Echo origin) /*
 		Quando uma thread cliente receber um novo pacote, esse método estático vai ser chamado.

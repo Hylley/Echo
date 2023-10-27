@@ -63,6 +63,10 @@ public final class Echo extends Thread implements Runnable /*
 
 	public static void shut(Echo echo)
 	{
+		HashMap<String, String> packet = new HashMap<>();
+		packet.put("request_type", "SERVER_DISCONNECT");
+		Echo.send(echo, packet);
+
 		try { echo.socket.close(); }
 		catch (IOException e) { throw new RuntimeException(e); }
 	}

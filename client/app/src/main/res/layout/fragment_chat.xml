@@ -24,6 +24,8 @@
 
     <FrameLayout
         android:id="@+id/send_button"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
@@ -33,14 +35,14 @@
         android:layout_marginBottom="16dp"
 
         android:background="@drawable/background_chat_send_button"
-        android:backgroundTint="@color/purple_700"
-    >
+        android:backgroundTint="@color/purple_700">
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="Send"
             android:padding="12dp"
             android:src="@drawable/round_send_24"
-            android:contentDescription="Send"
             app:tint="@color/white"
             tools:ignore="HardcodedText" />
     </FrameLayout>
