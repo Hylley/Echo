@@ -6,63 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".ChatFragment">
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/chat_scroll_view"
-        android:padding="16dp"
-        android:layout_marginBottom="76dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Hylley"
-                    android:textColor="@color/light_gray"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="?chatMessageInputColor"
-                    android:text="Eu sou lindo"
-                    android:textSize="19sp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Hylley"
-                    android:textColor="@color/light_gray"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="?chatMessageInputColor"
-                    android:text="Eu sou lindo"
-                    android:textSize="19sp"/>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:overScrollMode="ifContentScrolls"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="76dp"
+    >
+    </androidx.recyclerview.widget.RecyclerView>
 
     <FrameLayout
         android:id="@+id/send_button"
@@ -74,7 +29,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
 
-        android:background="@drawable/backgroud_chat_send_button"
+        android:background="@drawable/background_chat_send_button"
         android:backgroundTint="@color/purple_700"
     >
         <ImageView
@@ -83,10 +38,12 @@
             android:padding="12dp"
             android:src="@drawable/round_send_24"
             android:contentDescription="Send"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            tools:ignore="HardcodedText" />
     </FrameLayout>
 
     <EditText
+        android:id="@+id/message_input"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="10dp"
@@ -96,14 +53,15 @@
         android:paddingEnd="8dp"
         android:importantForAutofill="no"
 
-        android:background="@drawable/backgroud_chat_send_button"
+        android:background="@drawable/background_chat_send_button"
         android:layout_toStartOf="@id/send_button"
         android:layout_alignParentStart="true"
 
-        android:hint="Mensagem"
+        android:hint="Message"
         android:textColor="?colorOnPrimary"
-        android:textColorHint="@color/light_gray"
+        android:textColorHint="?chatMessageInputHintTextColor"
         android:inputType="text"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        tools:ignore="HardcodedText" />
 
 </RelativeLayout>

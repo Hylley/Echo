@@ -13,5 +13,8 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="chatMessageInputColor">@color/white</item>
+        <item name="chatMessageInputHintTextColor">@color/light_gray</item>
+        <item name="chatMessageSentBoxColor">@color/purple_700</item>
+        <item name="chatMessageReceivedBoxColor">@color/white</item>
     </style>
 </resources>

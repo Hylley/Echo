@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/message_body"
+        android:contentDescription="Profile image"
+        tools:ignore="HardcodedText"
+        />
+    
+    <TextView
+        android:id="@+id/message_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/message_received_background"
+        android:padding="12dp"
+        android:textColor="?colorOnPrimary"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.75"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toEndOf="@id/image_profile"
+    />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/image_profile"
+        app:layout_constraintStart_toStartOf="@id/image_profile"
+        android:layout_marginTop="5dp"
+        android:textColor="?chatMessageReceivedBoxColor"
+        android:textSize="13sp"
+    />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
