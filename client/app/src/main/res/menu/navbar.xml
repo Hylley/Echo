@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:id="@+id/form"
         android:title="Form"
@@ -13,5 +13,4 @@
         android:icon="@drawable/baseline_chat_24"
         tools:ignore="HardcodedText"
     />
-    
 </menu>

@@ -4,28 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FormFragment">
+    tools:context=".FormFragment" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        tools:ignore="UselessParent" >
+
         <EditText
             android:id="@+id/full_name"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_margin="40dp"
+            android:inputType="text"
+            android:importantForAutofill="no"
             android:hint="Nome completo"
-            />
+            tools:ignore="HardcodedText,VisualLintTextFieldSize"
+        />
 
         <EditText
             android:id="@+id/nick_name"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_margin="40dp"
+            android:inputType="text"
+            android:importantForAutofill="no"
             android:hint="Nome de usuário"
-            />
+            tools:ignore="HardcodedText,VisualLintTextFieldSize"
+        />
 
     </LinearLayout>
 
