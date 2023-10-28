@@ -8,23 +8,20 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hylley.echo.chat_handler.ChatFragment;
 import com.hylley.echo.network_handler.Client;
 
-import java.time.format.SignStyle;
 import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity
 {
-    //region App
+    //region Android app stuff
     BottomNavigationView view;
-
     FormFragment form_fragment = new FormFragment();
     ChatFragment chat_fragment = new ChatFragment(this);
     int active_fragment;
-
     static BadgeDrawable badge;
-    //enregion
+    //endregion
 
-    //region Network
+    //region Network stuff
     Client client = new Client("girlhood04", this);
     public static final boolean debug = true;
     //endregion
@@ -35,7 +32,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //region Fragments and tabs
+        //region Fragments and tabs layout setup
         getSupportFragmentManager().beginTransaction().replace(R.id.container, form_fragment).commit();
         view = findViewById(R.id.navbar);
         badge = view.getOrCreateBadge(R.id.chat); badge.setVisible(false);
@@ -65,13 +62,10 @@ public class MainActivity extends AppCompatActivity
         client.start();
     }
 
-    public void fragment_chat_is_ready()
-    {
-        if(debug) System.out.println("Chat is ready");
-    }
-
     public void append_network_global_message(String message)
     {
+        if(!Client.connected) return;
+
         HashMap<String, String> packet = new HashMap<>();
         packet.put("request_type", "GLOBAL_TEXT_MESSAGE");
         packet.put("name", Client.id);
@@ -87,9 +81,19 @@ public class MainActivity extends AppCompatActivity
 
     public void restart_client()
     {
-        client.end_process();
+        client.end_process(); client = null;
         client = new Client("girlhood04", this);
         client.start();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if(!isFinishing() || client == null) return;
+
+        client.end_process();
+        if(debug) System.out.println("Process ended successfully");
     }
 
     @SuppressWarnings("unused")
@@ -102,13 +106,5 @@ public class MainActivity extends AppCompatActivity
         badge.setVisible(visible);
     }
 
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        if(!isFinishing() || client == null) return;
-
-        client.end_process();
-        if(debug) System.out.println("Process ended successfully");
-    }
+    public void fragment_chat_is_ready() { if(debug) System.out.println("Chat is ready"); }
 }

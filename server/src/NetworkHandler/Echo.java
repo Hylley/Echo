@@ -55,7 +55,7 @@ public final class Echo extends Thread implements Runnable /*
 			if(Server.debug) System.out.println("[" + echo_shutdown_count.incrementAndGet() + "/" + Server.connections() + "] Closing Echo socket successfully");
 		}
 		catch (EOFException e) /*
-			Não se engane pelo nome. A exceção de fim de arquivo nesse contexto é lançada quando
+			Não se engane pelo nome. A exceção de "fim de arquivo", nesse contexto, é lançada quando
 			o cliente se desconecta repentinamente.
 		*/
 		{

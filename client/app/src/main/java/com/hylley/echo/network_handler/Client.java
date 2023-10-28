@@ -26,9 +26,10 @@ public class Client extends Thread implements Runnable
     public static String id;
     private static InetAddress server_address;
     ClientListener listener;
-    public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>();
+    public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
 
     public static Socket socket;
+    public static boolean connected = false;
     private static ObjectOutputStream output;
 
     static MainActivity main_activity;
@@ -43,6 +44,7 @@ public class Client extends Thread implements Runnable
     @SuppressWarnings("ConstantConditions")
     public void run()
     {
+        connected = false;
         // Escuta pacotes de descoberta através de UDP
         if(MainActivity.debug) System.out.println("Searching for broadcast");
 
@@ -80,6 +82,7 @@ public class Client extends Thread implements Runnable
         }
         catch (IOException e) { throw new RuntimeException(e); }
         if(MainActivity.debug) System.out.println("Connected");
+        connected = true;
 
         // Escuta por novas instruções do servidor
         listener = new ClientListener(main_activity); listener.start();

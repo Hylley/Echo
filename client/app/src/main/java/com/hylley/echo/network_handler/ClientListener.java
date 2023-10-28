@@ -2,7 +2,6 @@ package com.hylley.echo.network_handler;
 
 import com.hylley.echo.MainActivity;
 
-import android.app.Activity;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
