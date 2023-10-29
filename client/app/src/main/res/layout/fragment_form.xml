@@ -25,7 +25,7 @@
         />
 
         <EditText
-            android:id="@+id/nick_name"
+            android:id="@+id/user_name"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_margin="40dp"

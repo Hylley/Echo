@@ -65,16 +65,14 @@ public final class Server
 		switch (body.get("request_type"))
 		{
 			case "GLOBAL_TEXT_MESSAGE":
-				HashMap<String, String> message = new HashMap<>();
-				message.put("request_type", "GLOBAL_TEXT_MESSAGE");
-				message.put("name", origin.id);
-				message.put("text", body.get("text"));
-
-				for(Echo echo : connections) Echo.send(echo, message);
+				for(Echo echo : connections) Echo.send(echo, body);
 				break;
+
 			case "CLIENT_DISCONNECT":
 				Echo.shut(origin);
 				Server.disconnect(origin);
+				break;
+
 			case "ATTENDANCE_COUNT":
 			case "REGISTER_NEW_USER":
 			default: System.out.println("Err: Invalid request type;"); break;

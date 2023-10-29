@@ -18,21 +18,27 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Client extends Thread implements Runnable
 {
+    static MainActivity main_activity;
+
     //region Constants
     private static final int LISTEN_PORT = 6969;
     private static final int SEND_PORT = 6968;
     //endregion
 
+    //region Statics
     public static String id;
+    public static String full_name;
+    public static String user_name;
+    //endregion
+
+    //region Network
+    public static Socket socket;
+    private static ObjectOutputStream output;
     private static InetAddress server_address;
     ClientListener listener;
-    public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
-
-    public static Socket socket;
     public static boolean connected = false;
-    private static ObjectOutputStream output;
-
-    static MainActivity main_activity;
+    public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
+    //endregion
 
     public Client(String id, MainActivity main_activity)
     {
@@ -114,7 +120,9 @@ public class Client extends Thread implements Runnable
     {
         HashMap<String, String> packet = new HashMap<>();
         packet.put("request_type", "CLIENT_DISCONNECT");
+        packet.put("id", Client.id);
         send(packet);
+        connected = false;
 
         try
         {

@@ -21,6 +21,7 @@
         app:itemTextColor="?chatMessageInputColor"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navbar"
+        tools:ignore="VisualLintBottomNav"
     />
 
 </RelativeLayout>

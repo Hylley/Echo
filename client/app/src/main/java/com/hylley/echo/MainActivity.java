@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity
 {
     //region Android app stuff
     BottomNavigationView view;
-    FormFragment form_fragment = new FormFragment();
+    FormFragment form_fragment = new FormFragment(this);
     ChatFragment chat_fragment = new ChatFragment(this);
     int active_fragment;
     static BadgeDrawable badge;
@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity
 
         HashMap<String, String> packet = new HashMap<>();
         packet.put("request_type", "GLOBAL_TEXT_MESSAGE");
-        packet.put("name", Client.id);
+        packet.put("id", Client.id);
+        packet.put("username", Client.user_name);
         packet.put("text", message);
         client.packet_queue.add(packet);
     }
@@ -78,6 +79,9 @@ public class MainActivity extends AppCompatActivity
         chat_fragment.add_message(username, message_body);
         if(debug) System.out.println("[" + username + "] " + message_body);
     }
+
+    public void full_name_changed(String new_name) { Client.full_name = new_name; }
+    public void user_name_changed(String new_name) { Client.user_name = new_name; }
 
     public void restart_client()
     {
