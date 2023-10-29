@@ -14,6 +14,9 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class Client extends Thread implements Runnable
@@ -23,6 +26,7 @@ public class Client extends Thread implements Runnable
     //region Constants
     private static final int LISTEN_PORT = 6969;
     private static final int SEND_PORT = 6968;
+    private static final int PING_ATTENDANCE_PERIOD = 20;
     //endregion
 
     //region Statics
@@ -38,6 +42,7 @@ public class Client extends Thread implements Runnable
     ClientListener listener;
     public static boolean connected = false;
     public ConcurrentLinkedQueue<HashMap<String, String>> packet_queue = new ConcurrentLinkedQueue<>(); // Thread-safe API; eu fiz o meu dever de casa ;)
+    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     //endregion
 
     public Client(String id, MainActivity main_activity)
@@ -85,6 +90,7 @@ public class Client extends Thread implements Runnable
             output = new ObjectOutputStream(socket.getOutputStream());
 
             output.writeObject(id);
+            executor.scheduleAtFixedRate(this::ping_attendance, Client.PING_ATTENDANCE_PERIOD, Client.PING_ATTENDANCE_PERIOD, TimeUnit.SECONDS);
         }
         catch (IOException e) { throw new RuntimeException(e); }
         if(MainActivity.debug) System.out.println("Connected");
@@ -105,6 +111,18 @@ public class Client extends Thread implements Runnable
             }
         }
         while (!socket.isClosed());
+    }
+
+    public void ping_attendance()
+    {
+        if(Client.full_name.isBlank() || Client.full_name.isEmpty()) return;
+
+        HashMap<String, String> packet = new HashMap<>();
+        packet.put("request_type", "PING_ATTENDANCE");
+        packet.put("id", Client.id);
+        packet.put("full_name", Client.full_name);
+
+        this.send(packet);
     }
 
     public void send(Object packet)

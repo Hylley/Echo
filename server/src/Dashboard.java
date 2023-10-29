@@ -7,7 +7,7 @@ public class Dashboard extends JFrame
 	private JPanel panel;
 	private JList<String> echoes_list;
 	private JButton qr_btn;
-	private final DefaultListModel<String> echoes_list_model = new DefaultListModel<>();
+	public final DefaultListModel<String> echoes_list_model = new DefaultListModel<>();
 
 	public Dashboard()
 	{
@@ -44,8 +44,9 @@ public class Dashboard extends JFrame
 		setVisible(true);
 	}
 
-	public void update_echoes_list(String[] list)
+	public void append_echoes_list(String string)
 	{
-		echoes_list_model.addElement(list[0]);
+		if (echoes_list_model.contains(string)) return;
+		echoes_list_model.addElement(string);
 	}
 }

@@ -1,5 +1,6 @@
 package NetworkHandler;
 
+import javax.swing.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,12 +26,17 @@ public final class Server
 	public ListenNetwork listen_net;
 	//endregion
 
-	public Server(boolean debug)
+	//region Gambiarra
+	private static DefaultListModel<String> ui_model;
+	//endregion
+
+	public Server(boolean debug, DefaultListModel<String> ui_model)
 	{
 		try
 		{
 			this.ping_net   = new PingNetwork(DISCOVERY_BROADCAST_PERIOD, SEND_PORT);
 			this.listen_net = new ListenNetwork(new ServerSocket(LISTEN_PORT));
+			Server.ui_model = ui_model;
 		} catch (IOException e) { throw new RuntimeException(e); }
 
 		this.ping_net.start();
@@ -73,7 +79,11 @@ public final class Server
 				Server.disconnect(origin);
 				break;
 
-			case "ATTENDANCE_COUNT":
+			case "PING_ATTENDANCE":
+				String full_name = body.get("full_name");
+				if (ui_model.contains(full_name)) break;
+				ui_model.addElement(full_name);
+				break;
 			case "REGISTER_NEW_USER":
 			default: System.out.println("Err: Invalid request type;"); break;
 		}
