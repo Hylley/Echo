@@ -1,5 +1,7 @@
 package com.hylley.echo.network_handler;
 
+import android.widget.Toast;
+
 import com.hylley.echo.MainActivity;
 
 import java.io.BufferedInputStream;
@@ -58,6 +60,7 @@ public class Client extends Thread implements Runnable
         connected = false;
         // Escuta pacotes de descoberta através de UDP
         if(MainActivity.debug) System.out.println("Searching for broadcast");
+        main_activity.runOnUiThread(() -> Toast.makeText(main_activity.getApplicationContext(), "Buscando servidor...", Toast.LENGTH_SHORT).show());
 
         try( DatagramSocket broadcast = new DatagramSocket(LISTEN_PORT) )
         {
@@ -94,6 +97,8 @@ public class Client extends Thread implements Runnable
         }
         catch (IOException e) { throw new RuntimeException(e); }
         if(MainActivity.debug) System.out.println("Connected");
+        main_activity.runOnUiThread(() -> Toast.makeText(main_activity.getApplicationContext(), "Conexão estabelecida", Toast.LENGTH_SHORT).show());
+
         connected = true;
 
         // Escuta por novas instruções do servidor

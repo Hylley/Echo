@@ -2,6 +2,7 @@ package com.hylley.echo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,6 +51,12 @@ public class MainActivity extends AppCompatActivity
 
             if(switch_fragment == R.id.chat)
             {
+                if(!Client.connected)
+                {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nenhum servidor conectado", Toast.LENGTH_SHORT).show());
+                    return false;
+                }
+
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, chat_fragment).commit();
                 active_fragment = switch_fragment;
                 return true;
@@ -65,6 +72,16 @@ public class MainActivity extends AppCompatActivity
     public void append_network_global_message(String message)
     {
         if(!Client.connected) return;
+        if(Client.user_name.isEmpty() || Client.user_name.isBlank())
+        {
+            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nome de usuário não pode ser vazio", Toast.LENGTH_SHORT).show());
+            return;
+        }
+        if(Client.full_name.isEmpty() || Client.full_name.isBlank())
+        {
+            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nome completo não pode ser vazio", Toast.LENGTH_SHORT).show());
+            return;
+        }
 
         HashMap<String, String> packet = new HashMap<>();
         packet.put("request_type", "GLOBAL_TEXT_MESSAGE");
